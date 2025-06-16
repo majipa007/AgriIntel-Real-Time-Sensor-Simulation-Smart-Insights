@@ -1,0 +1,11 @@
+---
+# Kafka Producer Configuration
+producer:
+  bootstrap.servers: "localhost:9092" # Replace with your Kafka brokers
+  client.id: "my_python_producer" # A unique client identifier
+  # Optional configurations (uncomment and adjust as needed)
+  # acks: "all"  # Guarantees all in-sync replicas have received the record before it is considered sent
+  # retries: 3  # Number of retries if delivery fails
+  # batch.size: 16384  # Batch size in bytes before sending
+  # linger.ms: 1  # Add a small delay to allow other records to batch together
+  # buffer.memory: 33554432  # Total bytes of memory available to the producer for buffering

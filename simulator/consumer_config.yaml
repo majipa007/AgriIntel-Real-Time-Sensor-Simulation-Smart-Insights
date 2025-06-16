@@ -1,0 +1,13 @@
+---
+# Kafka Consumer Configuration
+consumer:
+  bootstrap.servers: "localhost:9092" # Replace with your Kafka brokers
+  group.id: "my_python_consumer_group" # Consumer group ID
+  auto.offset.reset: "earliest" # Where to start reading the topic if no offset is stored ("earliest", "latest", "none")
+  # Optional configurations (uncomment and adjust as needed)
+  # enable.auto.commit: False  # Disable automatic offset commits (for manual control)
+  # session.timeout.ms: 6000  # The timeout used to detect consumer failures
+  # heartbeat.interval.ms: 2000  # Expected time between heartbeats to the consumer coordinator
+  # max.poll.records: 500  # Maximum records to fetch per poll
+topics:
+  - "weather_data" # List of topics to subscribe to
