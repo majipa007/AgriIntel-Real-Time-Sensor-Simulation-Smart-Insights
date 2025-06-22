@@ -10,7 +10,7 @@ with open("consumer_config.yaml", "r") as f:
 
 # Create a Karka consumer
 consumer = Consumer(consumer_config)
-
+ 
 try:
     consumer.subscribe(topics)
     while True:

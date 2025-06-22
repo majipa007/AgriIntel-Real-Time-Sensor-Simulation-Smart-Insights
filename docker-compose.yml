@@ -1,4 +1,3 @@
-
 networks:
   agriintel-net:
     driver: bridge
@@ -12,7 +11,7 @@ services:
     networks:
       - agriintel-net
     ports:
-      # Port for external clients (like your Python scripts on the host machine).
+      # Port for external clients (like the Confluent Python scripts on the host machine).
       - "9092:9092"
       # Port for JMX monitoring.
       - "9101:9101"
@@ -45,25 +44,21 @@ services:
       # Persists Kafka data (topics, messages) across container restarts.
       - kafka_data:/var/lib/kafka/data
 
-  # The Confluent Control Center for a web-based UI.
-  control-center:
-    image: confluentinc/cp-control-center:latest
-    hostname: control-center
-    container_name: control-center
+  # The Kafka UI service.
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    hostname: kafka-ui
+    container_name: kafka-ui
     networks:
       - agriintel-net
     depends_on:
       - broker
     ports:
-      - "9021:9021"
+      - "8080:8080"  # Access via localhost:9021
     environment:
-      # Connects to the broker using the internal network listener.
-      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
-      CONTROL_CENTER_REPLICATION_FACTOR: 1
-      CONFLUENT_METRICS_ENABLE: 'false'
-    volumes:
-      # Persists Control Center data.
-      - control_center_data:/var/lib/confluent-control-center
+      KAFKA_CLUSTERS_0_NAME: 'AgriIntel-Kafka'
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'broker:29092'
+      DYNAMIC_CONFIG_ENABLED: 'true'
 
 # Defines the named volumes for data persistence.
 volumes:
