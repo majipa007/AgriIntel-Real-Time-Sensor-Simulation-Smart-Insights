@@ -1,44 +1,71 @@
 
-services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.0
-    hostname: zookeeper
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+networks:
+  agriintel-net:
+    driver: bridge
 
+services:
+  # The Kafka Broker service, running in KRaft mode (as both broker and controller).
   broker:
-    image: confluentinc/cp-kafka:7.6.0
+    image: confluentinc/cp-kafka:latest
     hostname: broker
-    depends_on:
-      - zookeeper
+    container_name: broker
+    networks:
+      - agriintel-net
     ports:
+      # Port for external clients (like your Python scripts on the host machine).
       - "9092:9092"
+      # Port for JMX monitoring.
       - "9101:9101"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      # --- KRaft Settings ---
+      # A unique ID for the cluster.
+      CLUSTER_ID: 'L8kR2vXzTqW_aBcDeFgHiJ'
+      # The role of this node. In a single-node setup, it's both broker and controller.
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      # The ID for this specific node.
+      KAFKA_NODE_ID: 1
+      # The list of nodes that will vote for the controller. In a single-node setup, it's just itself.
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
+      # The listener used for internal KRaft communication.
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+
+      # --- Listener Settings ---
+      # Defines all the listeners the broker will open.
+      KAFKA_LISTENERS: 'PLAINTEXT://:9092,PLAINTEXT_INTERNAL://:29092,CONTROLLER://:29093'
+      # Specifies how clients should connect. `localhost:9092` is for your host machine,
+      # while `broker:29092` is for other containers in the `agriintel-net` network.
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT'
+
+      # --- General Kafka Settings for a single-node setup ---
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_JMX_PORT: 9101
-      KAFKA_JMX_HOSTNAME: localhost# Function to generate weather datagg
+    volumes:
+      # Persists Kafka data (topics, messages) across container restarts.
+      - kafka_data:/var/lib/kafka/data
 
+  # The Confluent Control Center for a web-based UI.
   control-center:
-    image: confluentinc/cp-control-center:7.6.0
+    image: confluentinc/cp-control-center:latest
     hostname: control-center
+    container_name: control-center
+    networks:
+      - agriintel-net
     depends_on:
       - broker
     ports:
       - "9021:9021"
     environment:
+      # Connects to the broker using the internal network listener.
       CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
       CONTROL_CENTER_REPLICATION_FACTOR: 1
-      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
-      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_ENABLE: 'false'
+    volumes:
+      # Persists Control Center data.
+      - control_center_data:/var/lib/confluent-control-center
+
+# Defines the named volumes for data persistence.
+volumes:
+  kafka_data:
+  control_center_data:
