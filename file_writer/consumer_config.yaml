@@ -11,3 +11,6 @@ consumer:
   # max.poll.records: 500  # Maximum records to fetch per poll
 topics:
   - "weather_data" # List of topics to subscribe to
+storage:
+  base_path: "data/raw"
+  batch_size: 10000

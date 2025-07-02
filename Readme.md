@@ -10,6 +10,48 @@ The goal is to simulate and process environmental sensor data (like temperature,
 
 ---
 
+## 🚀 Local Development Setup
+
+Follow these steps to get the project running on your local machine.
+
+### 1. Start Core Infrastructure
+
+The Kafka message broker runs in Docker. Start it first:
+
+```bash
+docker-compose up -d
+```
+
+### 2. Install Python Dependencies
+
+It is highly recommended to use a Python virtual environment.
+
+```bash
+# For the data simulator
+pip install -r simulator/requirements.txt
+
+# For the data consumer/writer
+pip install -r file_writer/requirements.txt
+```
+
+### 3. Configure Spark Environment
+
+The project uses Apache Spark for data processing.
+
+**Prerequisites:**
+*   **Java 8 or 11:** Spark runs on the JVM. Ensure you have a compatible JDK installed.
+*   **Python 3.8+**
+
+**Installation:**
+Install `pyspark` in your virtual environment. We'll use version `3.4.1` to match our Kafka connector.
+
+```bash
+pip install pyspark==3.4.1
+```
+
+This setup uses the `spark-sql-kafka` package, which is automatically downloaded by Spark thanks to the configuration within the verification script. No manual dependency management or environment variables are needed for this step.
+---
+
 ## 💡 Key Features
 
 * **Kafka-based Simulation**
@@ -91,14 +133,14 @@ agriintel/
 
 ## 🛠️ Tools Involved
 
-| Component     | Tech Used               |
-| ------------- | ----------------------- |
-| Simulation    | Kafka Producer (Python) |
-| Ingestion     | Kafka Consumer          |
-| Storage (Raw) | Local File System       |
-| Processing    | Apache Spark (Batch)    |
-| Final Storage | PostgreSQL              |
-| Analytics     | Streamlit               |
-| LLM Assistant | FastAPI + OpenAI API    |
+| Component     | Tech Used                |
+|---------------|--------------------------|
+| Simulation    | Kafka Producer (Python)  |
+| Ingestion     | Kafka Consumer           |
+| Storage (Raw) | Local File System        |
+| Processing    | Apache Spark (PySpark)   |
+| Final Storage | PostgreSQL               |
+| Analytics     | Streamlit                |
+| LLM Assistant | FastAPI + OpenAI API     |
 
 ---
