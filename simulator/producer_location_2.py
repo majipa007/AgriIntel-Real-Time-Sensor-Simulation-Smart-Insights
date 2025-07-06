@@ -43,28 +43,14 @@ def generate_weather_data(location):
         "timestamp": int(time.time())
     }
 
-# List of all districts in Nepal
-locations = [
-    "Achham", "Arghakhanchi", "Baglung", "Baitadi", "Bajhang", "Bajura", "Banke", "Bara", "Bardiya", "Bhaktapur",
-    "Bhojpur", "Chitwan", "Dadeldhura", "Dailekh", "Dang", "Darchula", "Dhading", "Dhankuta", "Dhanusa", "Dolakha",
-    "Dolpa", "Doti", "Gorkha", "Gulmi", "Humla", "Ilam", "Jajarkot", "Jhapa", "Jumla", "Kailali", "Kalikot",
-    "Kanchanpur", "Kapilvastu", "Kaski", "Kathmandu", "Kavrepalanchok", "Khotang", "Lalitpur", "Lamjung",
-    "Mahottari", "Makwanpur", "Manang", "Morang", "Mugu", "Mustang", "Myagdi", "Nawalparasi (Bardaghat Susta East)",
-    "Nawalparasi (Bardaghat Susta West)", "Nuwakot", "Okhaldhunga", "Palpa", "Panchthar", "Parbat", "Parsa", "Pyuthan",
-    "Ramechhap", "Rasuwa", "Rautahat", "Rolpa", "Rukum (East)", "Rukum (West)", "Rupandehi", "Salyan",
-    "Sankhuwasabha", "Saptari", "Sarlahi", "Sindhuli", "Sindhupalchok", "Siraha", "Solukhumbu", "Sunsari",
-    "Surkhet", "Syangja", "Tanahu", "Taplejung", "Terhathum", "Udayapur"
-]
-
 try:
     while True:
-        for location in locations:
-            weather_data = generate_weather_data(location)
-            producer.produce('weather_data', 
-                             key=location, 
-                             value=json.dumps(weather_data).encode('utf-8'), 
-                             callback=delivery_report)
-            producer.poll(0)
+        weather_data = generate_weather_data("location_2")
+        producer.produce('weather_data', 
+                            key="location_2", 
+                            value=json.dumps(weather_data).encode('utf-8'), 
+                            callback=delivery_report)
+        producer.poll(0)
         time.sleep(1)
 except KeyboardInterrupt:
     pass

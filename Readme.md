@@ -8,6 +8,11 @@ The goal is to simulate and process environmental sensor data (like temperature,
 * *“Is this month drier than average?”*
 * *“How should I manage fungal risk for my wheat crop in Lucknow?”*
 
+
+---
+### Data Architecture (expected)
+![](./architecture/archiecture_diagram.png)
+
 ---
 
 ## 🚀 Local Development Setup
